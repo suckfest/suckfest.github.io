@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to Suno Prompting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The SPA is structured into four main thematic sections, accessible via a fixed top navigation bar. This structure is chosen to break down the dense report into digestible, task-oriented modules, enhancing usability and allowing users to explore content based on their immediate needs rather than following the linear structure of the original document. The sections are: 1. Prompt Foundations (interactive cards for core pillars), 2. The Architect (an interactive song builder for metatags), 3. Advanced Techniques (accordion layout for strategies), and 4. Interactive Template (a functional prompt builder). This task-oriented design prioritizes user interaction and practical application over passive reading. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation Method -> Interaction -> Justification -> Library/Method. 1. Prompt Pillars -> Inform/Organize -> Interactive HTML/CSS cards -> Click to reveal details -> More engaging than static text, breaks down info -> HTML/CSS/JS. 2. Metatag Directory -> Organize/Inform -> Interactive 'Song Builder' diagram -> Click section to see tags -> Makes abstract structure tangible -> HTML/CSS/JS. 3. Prompt Lexicon -> Inform/Explore -> Donut Chart + Filterable List -> Click chart to filter keywords -> Visualizes keyword distribution and aids discovery -> Chart.js, JS. 4. Universal Template -> Apply/Inform -> Interactive Form -> Fill inputs, get live feedback/output -> Transforms static template into a practical tool -> JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+            padding-bottom: 4px;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #D4A373;
+            transition: width 0.3s ease;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #D4A373;
+        }
+        .nav-link.active::after, .nav-link:hover::after {
+            width: 100%;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .song-part {
+            transition: background-color 0.3s ease, color 0.3s ease;
+            cursor: pointer;
+        }
+        .song-part:hover, .song-part.active {
+            background-color: #D4A373;
+            color: #FFFFFF;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-[#D4A373]">🎵 Suno Guide</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#foundations" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 active">Prompt Foundations</a>
+                        <a href="#architect" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700">The Architect</a>
+                        <a href="#advanced" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700">Advanced Techniques</a>
+                        <a href="#template" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700">Interactive Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div id="foundations" class="py-12 md:py-20 scroll-mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Prompt Foundations</h2>
+                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Master the four pillars of musical identity. Click on any pillar to explore the descriptive keywords that bring your vision to life.</p>
+                </div>
+
+                <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                    <div class="card bg-white p-6 rounded-lg shadow-md cursor-pointer" data-modal="genre">
+                        <h3 class="text-lg font-semibold text-gray-900">🎶 Genre & Style</h3>
+                        <p class="mt-2 text-gray-600">The primary driver of your song's identity. From 'Indie Folk' to 'Synthwave', specificity is key.</p>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-md cursor-pointer" data-modal="mood">
+                        <h3 class="text-lg font-semibold text-gray-900">🎨 Mood & Emotion</h3>
+                        <p class="mt-2 text-gray-600">Translate feeling into instruction. Use adjectives like 'melancholic' or 'upbeat' to shape the atmosphere.</p>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-md cursor-pointer" data-modal="instrumentation">
+                        <h3 class="text-lg font-semibold text-gray-900">🎸 Instrumentation & Production</h3>
+                        <p class="mt-2 text-gray-600">Paint a picture of the sonic palette. Specify instruments and production qualities like 'lo-fi' or 'polished'.</p>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-md cursor-pointer" data-modal="vocals">
+                        <h3 class="text-lg font-semibold text-gray-900">🎤 Vocal Preferences</h3>
+                        <p class="mt-2 text-gray-600">Define the character of the voice. Control gender, performance style, and delivery from 'whispers' to 'powerful lead'.</p>
+                    </div>
+                </div>
+                
+                <div class="mt-16 bg-white p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-bold text-center mb-2">The Prompt Lexicon Explorer</h3>
+                    <p class="text-center text-gray-500 mb-8">The chart below visualizes the richness of descriptive keywords available. Click on a category in the chart to filter the keyword list and discover new terms to use in your prompts.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="chart-container">
+                            <canvas id="lexiconChart"></canvas>
+                        </div>
+                        <div>
+                            <h4 id="keyword-title" class="text-xl font-semibold mb-4 text-[#D4A373]">All Keywords</h4>
+                            <div id="keyword-list" class="h-96 overflow-y-auto p-4 bg-gray-50 rounded-lg border">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="architect" class="bg-white py-12 md:py-20 scroll-mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">The Architect: Structural Prompting</h2>
+                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Use metatags to build your song's structure. Click on any part of the song below to learn about the specific tags that give you architectural control.</p>
+                </div>
+                <div class="mt-12">
+                    <div class="flex flex-col items-center space-y-2">
+                        <div class="song-part w-full max-w-md text-center p-3 rounded-lg border-2 border-dashed border-gray-300" data-song-part="intro">
+                            [Intro]
+                        </div>
+                        <div class="text-gray-400">↓</div>
+                        <div class="song-part w-full max-w-md text-center p-3 rounded-lg border-2 border-gray-300" data-song-part="verse">
+                            [Verse]
+                        </div>
+                        <div class="text-gray-400">↓</div>
+                        <div class="song-part w-full max-w-md text-center p-3 rounded-lg border-2 border-gray-300" data-song-part="chorus">
+                            [Chorus]
+                        </div>
+                        <div class="text-gray-400">↓</div>
+                        <div class="song-part w-full max-w-md text-center p-3 rounded-lg border-2 border-gray-300" data-song-part="bridge">
+                            [Bridge / Solo]
+                        </div>
+                        <div class="text-gray-400">↓</div>
+                        <div class="song-part w-full max-w-md text-center p-3 rounded-lg border-2 border-gray-300" data-song-part="outro">
+                            [Outro]
+                        </div>
+                    </div>
+                    <div id="song-part-details" class="mt-8 max-w-3xl mx-auto p-6 bg-gray-50 rounded-lg border hidden">
+                        <h4 id="details-title" class="text-xl font-bold text-[#D4A373]"></h4>
+                        <p id="details-description" class="mt-2 text-gray-600"></p>
+                        <div class="mt-4">
+                            <h5 class="font-semibold">Common Tags:</h5>
+                            <ul id="details-tags" class="list-disc list-inside mt-2 space-y-1 text-gray-600">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="advanced" class="py-12 md:py-20 scroll-mt-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Advanced Techniques</h2>
+                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Elevate your prompting with expert strategies. Expand the sections below to learn about workflow, subtle cues, and emulating styles.</p>
+                </div>
+                <div id="accordion-container" class="mt-12 space-y-4">
+                </div>
+            </div>
+        </div>
+
+        <div id="template" class="bg-white py-12 md:py-20 scroll-mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Interactive Prompt Template</h2>
+                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Use this tool to build your own high-impact prompts. Fill in the fields to generate a complete, structured prompt ready for Suno.</p>
+                </div>
+                <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">1. Craft Your Prompt</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="style-genre" class="block text-sm font-medium text-gray-700">Primary Genre(s)</label>
+                                <input type="text" id="style-genre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm" placeholder="e.g., Dark Synthwave, Cyberpunk">
+                            </div>
+                            <div>
+                                <label for="style-mood" class="block text-sm font-medium text-gray-700">Key Mood/Vibe</label>
+                                <input type="text" id="style-mood" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm" placeholder="e.g., driving, intense, atmospheric">
+                            </div>
+                            <div>
+                                <label for="style-instruments" class="block text-sm font-medium text-gray-700">Core Instrumentation</label>
+                                <input type="text" id="style-instruments" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm" placeholder="e.g., analog synths, driving drum machine">
+                            </div>
+                            <div>
+                                <label for="style-vocals" class="block text-sm font-medium text-gray-700">Vocal Style</label>
+                                <input type="text" id="style-vocals" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm" placeholder="e.g., ethereal Female vocals">
+                            </div>
+                            <div>
+                                <label for="lyrics-area" class="block text-sm font-medium text-gray-700">Lyrics & Structure</label>
+                                <textarea id="lyrics-area" rows="10" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm" placeholder="[Intro: sound of rain]&#10;[Verse 1]&#10;Lyrics here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sticky top-20 h-fit">
+                        <h3 class="text-xl font-semibold mb-4">2. Your Generated Prompt</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between items-center">
+                                    <label class="block text-sm font-medium text-gray-700">Style of Music Box</label>
+                                    <span id="style-char-count" class="text-sm text-gray-500">0 / 200</span>
+                                </div>
+                                <div class="relative mt-1">
+                                    <textarea id="output-style" rows="4" class="block w-full rounded-md border-gray-200 bg-gray-50 shadow-sm sm:text-sm" readonly></textarea>
+                                    <button onclick="copyToClipboard('output-style')" class="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-gray-600 p-1.5 rounded-md text-xs">Copy</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center">
+                                    <label class="block text-sm font-medium text-gray-700">Custom Lyrics Box</label>
+                                     <span id="lyrics-char-count" class="text-sm text-gray-500">0 / 3000</span>
+                                </div>
+                                <div class="relative mt-1">
+                                    <textarea id="output-lyrics" rows="10" class="block w-full rounded-md border-gray-200 bg-gray-50 shadow-sm sm:text-sm" readonly></textarea>
+                                     <button onclick="copyToClipboard('output-lyrics')" class="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-gray-600 p-1.5 rounded-md text-xs">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="modal-overlay fixed inset-0"></div>
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-y-auto relative transform scale-95">
+            <div class="p-6">
+                <div class="flex justify-between items-start">
+                    <h3 id="modal-title" class="text-2xl font-bold text-gray-900"></h3>
+                    <button id="modal-close" class="text-gray-400 hover:text-gray-600">&times;</button>
+                </div>
+                <div id="modal-body" class="mt-4 text-gray-600"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="copy-notification" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 transition-opacity duration-300">
+        Copied to clipboard!
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const lexiconData = {
+                'Genre & Style': {
+                    'Electronic': ['Synthwave', 'Lo-fi', 'Ambient', 'Downtempo', 'Glitch Hop', 'EDM', 'Techno', 'Trance', 'House', 'Dubstep', 'Chiptune', 'IDM'],
+                    'Rock / Metal': ['Indie Rock', 'Alternative Rock', 'Punk Rock', 'Classic Rock', 'Grunge', 'Psychedelic Rock', 'Heavy Metal', 'Power Metal', 'Screamo', 'Nu Metal'],
+                    'Pop': ['Pop-Rock', 'Chamber Pop', 'Synth-Pop', 'Dance-Pop', 'Bubblegum Pop', 'J-Pop', 'K-Pop'],
+                    'Hip-Hop / R&B': ['Boom Bap', 'Trap', 'Drill', 'Lyrical Hip-Hop', 'Emo-Rap', 'Soul', 'Neo-Soul', 'Funk', 'Smooth R&B'],
+                    'Folk / Country': ['Americana', 'Bluegrass', 'Country-Rock', 'Indie Folk', 'Singer-Songwriter', 'Celtic', 'Zydeco'],
+                    'Jazz / Blues': ['Bossa Nova', 'Blues Rock', 'Torch-Lounge', 'Jazzy Blues', 'Swing', 'Big Band'],
+                    'World': ['Reggae', 'Zouk', 'Afrobeat', 'Bossa Nova', 'Hindi Boombap', 'Japanese Reggae'],
+                    'Other': ['Cinematic', 'Orchestral', 'Epic Soundtrack', 'Ballad', 'New Age', 'Gospel', 'Worship']
+                },
+                'Mood & Emotion': {
+                    'Energy Level': ['Upbeat', 'Energetic', 'Driving', 'Fast-Paced', 'High-Energy', 'Intense', 'Dynamic', 'Soaring', 'Mellow', 'Slow', 'Low-Key', 'Laid-back', 'Calming', 'Relaxing', 'Peaceful', 'Meditative', 'Downtempo'],
+                    'Emotional Tone': ['Melancholic', 'Sad', 'Emotional', 'Heartfelt', 'Soulful', 'Inspiring', 'Uplifting', 'Hopeful', 'Joyful', 'Nostalgic', 'Dreamy', 'Dark', 'Sinister', 'Mysterious', 'Haunting', 'Ethereal', 'Atmospheric', 'Cold', 'Raw'],
+                    'Vibe': ['Anthemic', 'Epic', 'Cinematic', 'Theatrical', 'Groovy', 'Danceable', 'Catchy', 'Retro', 'Vintage', 'Modern']
+                },
+                'Instrumentation': {
+                    'Guitars': ['Acoustic Guitar', 'Electric Guitar', 'Distorted Guitar', 'Clean Electric Guitar', 'Soaring Guitar Solos', 'Pedal Steel', 'Nylon Guitar'],
+                    'Keys': ['Piano', 'Grand Piano', 'Electric Piano', 'Hammond Organ', 'Synthesizers', 'Analog Synths', 'Atmospheric Pads', 'Arpeggiated Synths'],
+                    'Drums / Percussion': ['Energetic Drums', 'Dynamic Drums', 'Subtle Percussion', 'Drum Machine', '808 Drums', 'Live Drums', 'Djembe', 'Polyrhythms'],
+                    'Strings / Orchestral': ['Strings', 'String Quartet', 'Orchestral Arrangement', 'Cello', 'Violin', 'Harp'],
+                    'Wind / Brass': ['Saxophone', 'Horns', 'Tin Whistle', 'Flute'],
+                    'Production': ['Lo-fi', 'Polished', 'Studio-Quality', 'Reverb-heavy', 'Sidechain Compression', 'Detuned Effects', 'Vinyl Scratches', 'Field Recordings']
+                },
+                'Vocal Style': {
+                    'Gender / Age': ['Male Vocals', 'Female Vocals', 'Child Voice', 'Deep Voice', 'High-Pitched Voice'],
+                    'Performance': ['Lead Vocals', 'Background Vocals', 'Harmonies', 'Harmonized Chorus', 'Duet', 'Choir', 'Announcer', 'Narrator', 'Reporter'],
+                    'Delivery': ['Singing', 'Rapping', 'Spoken Word', 'Whispers', 'Screaming Vocals', 'Ethereal Vocals', 'Smooth Vocals', 'Raw Vocals', 'Powerful Vocals'],
+                    'Effects': ['Echoing Vocals', 'Reverb-heavy Vocals', 'Layered Vocals', 'Vocal Chops', 'Stutter Vocals']
+                }
+            };
+
+            const modalData = {
+                genre: { title: '🎶 Genre & Style', content: lexiconData['Genre & Style'] },
+                mood: { title: '🎨 Mood & Emotion', content: lexiconData['Mood & Emotion'] },
+                instrumentation: { title: '🎸 Instrumentation & Production', content: lexiconData['Instrumentation'] },
+                vocals: { title: '🎤 Vocal Preferences', content: lexiconData['Vocal Style'] }
+            };
+
+            const songPartData = {
+                intro: {
+                    title: '[Intro]',
+                    description: 'The opening section of the song. Use this to set the mood with instrumental cues or non-musical sounds.',
+                    tags: ['`[Intro: gentle acoustic guitar]`', '`[Intro: sound of pouring rain]`', '`[Intro: preacher voice sample]`', '`[intro slow]`']
+                },
+                verse: {
+                    title: '[Verse]',
+                    description: 'The main storytelling section. You can specify instrumentation and vocal delivery to match the lyrical content.',
+                    tags: ['`[Verse 1]`', '`[Verse: spoken-word delivery]`', '`[Verse: acoustic guitar and male vocal]`']
+                },
+                chorus: {
+                    title: '[Chorus]',
+                    description: 'The main, repeatable refrain. This is typically the highest energy part of the song.',
+                    tags: ['`[Chorus: powerful, harmonized vocals]`', '`[Chorus: full band enters]`', '`[chorus fast-paced]`']
+                },
+                bridge: {
+                    title: '[Bridge / Solo]',
+                    description: 'A transitional section that provides contrast. Use it for a change of pace, a new musical idea, or an instrumental solo.',
+                    tags: ['`[Bridge: slower tempo, reflective]`', '`[Solo: soaring electric guitar solo]`', '`[Instrumental Break]`']
+                },
+                outro: {
+                    title: '[Outro]',
+                    description: 'The closing section. Use tags to fade out, end abruptly, or leave a lasting impression.',
+                    tags: ['`[Outro: fade out with strings]`', '`[Intense Guitar Outro]`', '`[End]`']
+                }
+            };
+            
+            const advancedTechniquesData = [
+                {
+                    title: 'The Dual-Canvas Workflow',
+                    content: `Treat the "Style of Music" and "Custom Lyrics" boxes as separate canvases. Use the Style box for a concise, high-level summary (the 'recipe') and the Lyrics box for the detailed architectural plan (the 'blueprint') with all your metatags.`
+                },
+                {
+                    title: 'Power of Punctuation & Capitalization',
+                    content: `Use subtle typographic cues to influence the AI. CAPITALIZING important terms like genres or vocal gender seems to give them more weight. Sparse use of commas or ellipses (...) can influence vocal pacing and create pauses.`
+                },
+                {
+                    title: 'Emulating Artist Styles',
+                    content: `Since you can't use artist names, deconstruct their style. Use an external tool like a large language model to analyze an artist's sound and provide descriptive keywords for genre, mood, instrumentation, and production. This translates a specific sound into a language Suno understands.`
+                },
+                {
+                    title: 'The Title as a Creative Seed',
+                    content: `The "Song Title" field can act as a thematic seed, subtly influencing the overall character of the generation. This can be useful for maintaining consistency across multiple related tracks.`
+                }
+            ];
+
+            const modalContainer = document.getElementById('modal-container');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalClose = document.getElementById('modal-close');
+            const modalOverlay = document.querySelector('.modal-overlay');
+
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const modalId = card.dataset.modal;
+                    const data = modalData[modalId];
+                    modalTitle.textContent = data.title;
+                    let contentHTML = '';
+                    for (const category in data.content) {
+                        contentHTML += `<h4 class="font-semibold text-lg mt-4 mb-2 text-gray-800">${category}</h4>`;
+                        contentHTML += `<div class="flex flex-wrap gap-2">`;
+                        data.content[category].forEach(keyword => {
+                            contentHTML += `<span class="bg-amber-100 text-amber-800 text-sm font-medium px-2.5 py-0.5 rounded">${keyword}</span>`;
+                        });
+                        contentHTML += `</div>`;
+                    }
+                    modalBody.innerHTML = contentHTML;
+                    modalContainer.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    setTimeout(() => {
+                        modalContainer.querySelector('.modal-overlay').classList.add('opacity-100');
+                        modalContainer.querySelector('.modal-content').classList.add('scale-100');
+                        modalContainer.querySelector('.modal-content').classList.remove('scale-95');
+                    }, 10);
+                });
+            });
+
+            function closeModal() {
+                modalContainer.querySelector('.modal-overlay').classList.remove('opacity-100');
+                modalContainer.querySelector('.modal-content').classList.remove('scale-100');
+                modalContainer.querySelector('.modal-content').classList.add('scale-95');
+                setTimeout(() => {
+                    modalContainer.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', closeModal);
+
+            const songParts = document.querySelectorAll('.song-part');
+            const detailsContainer = document.getElementById('song-part-details');
+            const detailsTitle = document.getElementById('details-title');
+            const detailsDescription = document.getElementById('details-description');
+            const detailsTags = document.getElementById('details-tags');
+
+            songParts.forEach(part => {
+                part.addEventListener('click', () => {
+                    songParts.forEach(p => p.classList.remove('active'));
+                    part.classList.add('active');
+                    const partId = part.dataset.songPart;
+                    const data = songPartData[partId];
+                    detailsTitle.textContent = data.title;
+                    detailsDescription.textContent = data.description;
+                    detailsTags.innerHTML = data.tags.map(tag => `<li>${tag}</li>`).join('');
+                    detailsContainer.classList.remove('hidden');
+                });
+            });
+
+            const accordionContainer = document.getElementById('accordion-container');
+            advancedTechniquesData.forEach((item, index) => {
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'border border-gray-200 rounded-lg';
+                accordionItem.innerHTML = `
+                    <h2>
+                        <button type="button" class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-700 bg-gray-50 hover:bg-gray-100" data-accordion-target="#accordion-body-${index}">
+                            <span>${item.title}</span>
+                            <svg class="w-6 h-6 shrink-0 transform" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        </button>
+                    </h2>
+                    <div id="accordion-body-${index}" class="accordion-content p-5 border-t border-gray-200">
+                        <p class="text-gray-600">${item.content}</p>
+                    </div>
+                `;
+                accordionContainer.appendChild(accordionItem);
+            });
+
+            document.querySelectorAll('[data-accordion-target]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const target = document.querySelector(button.dataset.accordionTarget);
+                    const icon = button.querySelector('svg');
+                    const isExpanded = target.style.maxHeight && target.style.maxHeight !== '0px';
+
+                    if (isExpanded) {
+                        target.style.maxHeight = '0px';
+                        icon.classList.remove('rotate-180');
+                    } else {
+                        target.style.maxHeight = target.scrollHeight + 'px';
+                        icon.classList.add('rotate-180');
+                    }
+                });
+            });
+            
+            const templateInputs = ['style-genre', 'style-mood', 'style-instruments', 'style-vocals', 'lyrics-area'];
+            templateInputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', updateTemplateOutput);
+            });
+            updateTemplateOutput();
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main > div[id]');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            const ctx = document.getElementById('lexiconChart').getContext('2d');
+            const keywordListEl = document.getElementById('keyword-list');
+            const keywordTitleEl = document.getElementById('keyword-title');
+
+            const chartData = {
+                labels: Object.keys(lexiconData),
+                datasets: [{
+                    label: 'Keyword Categories',
+                    data: Object.values(lexiconData).map(cat => Object.values(cat).flat().length),
+                    backgroundColor: ['#D4A373', '#E9C46A', '#F4A261', '#E76F51'],
+                    borderColor: '#FDFBF8',
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            };
+
+            const lexiconChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + ' keywords';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const chartElement = elements[0];
+                            const label = lexiconChart.data.labels[chartElement.index];
+                            updateKeywordList(label);
+                        }
+                    }
+                }
+            });
+
+            function updateKeywordList(category = null) {
+                keywordListEl.innerHTML = '';
+                let dataToShow;
+
+                if (category && lexiconData[category]) {
+                    dataToShow = lexiconData[category];
+                    keywordTitleEl.textContent = `${category} Keywords`;
+                } else {
+                    dataToShow = Object.values(lexiconData).reduce((acc, val) => ({ ...acc, ...val }), {});
+                    keywordTitleEl.textContent = 'All Keywords';
+                }
+
+                for (const subCat in dataToShow) {
+                    const subCatTitle = document.createElement('h5');
+                    subCatTitle.className = 'font-semibold text-md mt-3 mb-1 text-gray-700';
+                    subCatTitle.textContent = subCat;
+                    keywordListEl.appendChild(subCatTitle);
+
+                    const keywordContainer = document.createElement('div');
+                    keywordContainer.className = 'flex flex-wrap gap-1.5';
+                    dataToShow[subCat].forEach(keyword => {
+                        const span = document.createElement('span');
+                        span.className = 'bg-gray-200 text-gray-700 text-xs font-medium px-2 py-0.5 rounded';
+                        span.textContent = keyword;
+                        keywordContainer.appendChild(span);
+                    });
+                    keywordListEl.appendChild(keywordContainer);
+                }
+            }
+            updateKeywordList();
+        });
+
+        function updateTemplateOutput() {
+            const genre = document.getElementById('style-genre').value;
+            const mood = document.getElementById('style-mood').value;
+            const instruments = document.getElementById('style-instruments').value;
+            const vocals = document.getElementById('style-vocals').value;
+            const lyrics = document.getElementById('lyrics-area').value;
+
+            const styleParts = [genre, mood, instruments, vocals].filter(Boolean);
+            const styleText = styleParts.join(', ');
+            
+            const outputStyle = document.getElementById('output-style');
+            outputStyle.value = styleText;
+            
+            const outputLyrics = document.getElementById('output-lyrics');
+            outputLyrics.value = lyrics;
+
+            const styleCharCount = document.getElementById('style-char-count');
+            const lyricsCharCount = document.getElementById('lyrics-char-count');
+            
+            styleCharCount.textContent = `${styleText.length} / 200`;
+            styleCharCount.classList.toggle('text-red-500', styleText.length > 200);
+            
+            lyricsCharCount.textContent = `${lyrics.length} / 3000`;
+            lyricsCharCount.classList.toggle('text-red-500', lyrics.length > 3000);
+        }
+
+        function copyToClipboard(elementId) {
+            const textArea = document.getElementById(elementId);
+            textArea.select();
+            textArea.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                showCopyNotification();
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+        }
+
+        function showCopyNotification() {
+            const notification = document.getElementById('copy-notification');
+            notification.classList.remove('opacity-0');
+            setTimeout(() => {
+                notification.classList.add('opacity-0');
+            }, 2000);
+        }
+
+    </script>
+</body>
+</html>
